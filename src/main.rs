@@ -69,7 +69,7 @@ impl Node {
         }
         else {
             match &self.data {
-                NodeData::U8(data) => {
+                NodeData::U8(data) => { //same lines (without the any part) across all types, a way to cut these lines maybe?
                     match self.kind {
                         NodeKind::Fixed => {
                             let stringed = data.unwrap().to_string();
@@ -122,7 +122,8 @@ impl Node {
                 }
             }
 
-            /*let mut responses: Vec<String> = Vec::new(); do dis
+            /* also process its nodes if the value is right...
+            let mut responses: Vec<String> = Vec::new(); do dis
             for node in &self.nodes {
                 responses.extend(node.check(input.clone()))
             }
@@ -215,16 +216,27 @@ impl Commander {
 }
 
 fn main() {
-    let command = Command::new(String::from("console"))
+    let console = Command::new(String::from("console")) //we compose a command
         .add_node(Node::fixed_string_new(String::from("clear")));
 
+    let u8_fixed_test = Command::new(String::from("u8_fixed_test"))
+        .add_node(Node::fixed_u8_new(8))
+        .add_node(Node::fixed_u8_new(16));
+
+    let u8_any_test = Command::new(String::from("u8_any_test"))
+        .add_node(Node::any_u8_new());
+
     let mut commander = Commander::new();
-    commander.add(command);
+    commander.add(console);
+    commander.add(u8_fixed_test);
+    commander.add(u8_any_test);
 
-    let mut input = String::new();
-    println!("Enter command: ");
-    std::io::stdin().read_line(&mut input).expect("error reading user input");
-    input.pop(); input.pop();
+    loop {
+        let mut input = String::new();
+        println!("Enter command: ");
+        std::io::stdin().read_line(&mut input).expect("error reading user input");
+        input.pop(); input.pop(); //need to remove the last two chars? windows stuff?
 
-    println!("{:?}", commander.search(input));
+        println!("Possible completions: {:?}", commander.search(input));
+    }
 }
